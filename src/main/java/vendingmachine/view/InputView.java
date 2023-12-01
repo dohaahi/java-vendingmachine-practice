@@ -24,6 +24,7 @@ public class InputView {
     }
 
     public static Drinks readDrinks() {
+        System.out.println();
         System.out.println(DRINK_INPUT_MESSAGE);
         String input = readLine();
         validateInputDrink(input);
@@ -33,6 +34,7 @@ public class InputView {
     }
 
     public static Money readPaymentAmount() {
+        System.out.println();
         System.out.println(PAYMENT_AMOUNT_INPUT_MESSAGE);
         String input = readLine();
         validateInputHeldAmount(input);
