@@ -7,7 +7,7 @@ import vendingmachine.exception.IllegalDrinkException;
 public class DrinkValidator {
     public static final int MIN_PURCHASE_AMOUNT_NUMBER = 100;
     public static final int MAX_DRINK_COUNT = 50;
-    private static final String DRINK_REGEX = "^[[가-힣]+,[\\d]+,[\\d]+]+(;[[가-힣]+,[\\d]+,[\\d]+]+)*$";
+    private static final String DRINK_REGEX = "^[\\[가-힣]+,[\\d]+,[\\d]+]+(;[\\[가-힣]+,[\\d]+,[\\d]+]+)*$";
     private static final String INVALID_DRINK_COUNT = "상품 가능 최대 개수는 50개 이하입니다. 다시 입력해 주세요.";
 
     public static void validateInputDrink(final String input) {
