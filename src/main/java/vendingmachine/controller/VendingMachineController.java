@@ -19,6 +19,8 @@ public class VendingMachineController {
         Drinks drinks = retryIfFailure(InputView::readDrinks);
         Money paymentAmount = retryIfFailure(InputView::readPaymentAmount);
 
+        InputView.readPurchaseDrink(paymentAmount);
+
         // 2. 실행
 
         // 3. 출력

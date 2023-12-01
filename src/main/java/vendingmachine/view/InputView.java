@@ -43,6 +43,11 @@ public class InputView {
         return Money.from(amount);
     }
 
+    public static void readPurchaseDrink(final Money paymentAmount) {
+        System.out.println();
+        System.out.println();
+    }
+
     private static String readLine() {
         return Console.readLine().trim();
     }
