@@ -3,9 +3,9 @@ package vendingmachine.domain;
 import static vendingmachine.validator.MoneyValidator.validateMoney;
 
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import vendingmachine.domain.dto.VendingMachineCoinDto;
 
 public class Coins {
@@ -21,24 +21,47 @@ public class Coins {
     }
 
     public VendingMachineCoinDto toCoinDto() {
-        return new VendingMachineCoinDto(
-                coins.get(Coin.COIN_500),
-                coins.get(Coin.COIN_100),
-                coins.get(Coin.COIN_50),
+        return new VendingMachineCoinDto(coins.get(Coin.COIN_500), coins.get(Coin.COIN_100), coins.get(Coin.COIN_50),
                 coins.get(Coin.COIN_10));
     }
 
     public int getTotalCoins() {
-        return coins.entrySet()
-                .stream()
-                .mapToInt(coins -> coins.getKey().getAmount() * coins.getValue())
-                .sum();
+        return coins.entrySet().stream().mapToInt(coins -> coins.getKey().getAmount() * coins.getValue()).sum();
+    }
+
+    public Map<Integer, Integer> getChange(final int balance) {
+        // coins를 순회하며 count만큼 totalChange-총잔돈에 추가
+        // 만약, 총잔돈이 balance-잔액보다 크면 return
+        Map<Integer, Integer> change = new LinkedHashMap<>();
+        int totalChange = 0;
+
+        for (Entry<Coin, Integer> entry : coins.entrySet()) {
+            Coin coin = entry.getKey();
+            Integer coinCount = entry.getValue();
+
+            while (totalChange < balance && coinCount > 0 && totalChange + coin.getAmount() <= balance) {
+                totalChange += coin.getAmount();
+                change.put(coin.getAmount(), coinCount + 1);
+                coinCount--;
+            }
+        }
+
+        return change;
     }
 
     private Map<Coin, Integer> makeCoins(final int amount) {
         Map<Coin, Integer> coins = generateCoinStorage();
 
         return makeCoinsRecursive(amount, coins);
+    }
+
+    private Map<Coin, Integer> generateCoinStorage() {
+        Map<Coin, Integer> coins = new EnumMap<>(Coin.class);
+        int initCount = 0;
+
+        Coin.getCoins().forEach(coin -> coins.put(coin, initCount));
+
+        return coins;
     }
 
     private Map<Coin, Integer> makeCoinsRecursive(int remainingCoins, final Map<Coin, Integer> coins) {
@@ -52,29 +75,5 @@ public class Coins {
         remainingCoins -= randomCoin.getAmount();
 
         return makeCoinsRecursive(remainingCoins, coins);
-    }
-
-    private Map<Coin, Integer> generateCoinStorage() {
-        Map<Coin, Integer> coins = new EnumMap<>(Coin.class);
-        int initCount = 0;
-
-        Coin.getCoins().forEach(coin -> coins.put(coin, initCount));
-
-        return coins;
-    }
-
-    private void useCoins(final int totalPurchaseAmount) {
-        // TODO: 잔돈 반환 기능
-        Set<Entry<Coin, Integer>> entries = coins.entrySet();
-        int totalChangeCoin = 0;
-
-        for (Entry<Coin, Integer> coin : entries) {
-            Integer coinCount = coin.getValue();
-
-            while (coinCount > 0) {
-                totalChangeCoin += coinCount;
-                coin.setValue(coinCount--);
-            }
-        }
     }
 }

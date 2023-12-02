@@ -20,23 +20,23 @@ public class InputView {
     private static final String PAYMENT_AMOUNT_INPUT_MESSAGE = System.lineSeparator() + "투입 금액을 입력해 주세요.";
     private static final String PURCHASE_DRINK_INPUT_MESSAGE = System.lineSeparator() +
             """
-                    투입 금액:%d원
+                    투입 금액: %d원
                     구매할 상품명을 입력해 주세요.
                     """.stripIndent();
 
     public static VendingMachine makeVendingMachine() {
-        Coins coins = retryIfFailure(InputView::readVendingMachineAmount);
+        final Coins coins = retryIfFailure(InputView::readVendingMachineAmount);
         OutputView.printVendingMachineAmount(coins.toCoinDto());
-        
-        Drinks drinks = retryIfFailure(InputView::readDrinks);
-        Money paymentAmount = retryIfFailure(InputView::readPaymentAmount);
+
+        final Drinks drinks = retryIfFailure(InputView::readDrinks);
+        final Money paymentAmount = retryIfFailure(InputView::readPaymentAmount);
 
         return VendingMachine.of(coins, drinks, paymentAmount);
     }
 
     public static PurchaseDrink readPurchaseDrink(final VendingMachine vendingMachine) {
         System.out.printf(PURCHASE_DRINK_INPUT_MESSAGE, vendingMachine.getPaymentAmount());
-        String input = readLine();
+        final String input = readLine();
         validateInputPurchaseDrink(input);
 
         return PurchaseDrink.from(vendingMachine, input);
@@ -44,28 +44,28 @@ public class InputView {
 
     private static Coins readVendingMachineAmount() {
         System.out.println(HELD_MONEY_AMOUNT_INPUT_MESSAGE);
-        String input = readLine();
+        final String input = readLine();
         validateInputHeldAmount(input);
 
-        int amount = InputConverter.mapToInt(input);
+        final int amount = InputConverter.mapToInt(input);
         return Coins.from(amount);
     }
 
     private static Drinks readDrinks() {
         System.out.println(DRINK_INPUT_MESSAGE);
-        String input = readLine();
+        final String input = readLine();
         validateInputDrink(input);
 
-        List<Drink> drinks = InputConverter.separatedToTuple(input);
+        final List<Drink> drinks = InputConverter.separatedToTuple(input);
         return Drinks.of(drinks);
     }
 
     private static Money readPaymentAmount() {
         System.out.println(PAYMENT_AMOUNT_INPUT_MESSAGE);
-        String input = readLine();
+        final String input = readLine();
         validateInputHeldAmount(input);
 
-        int amount = InputConverter.mapToInt(input);
+        final int amount = InputConverter.mapToInt(input);
         return Money.from(amount);
     }
 

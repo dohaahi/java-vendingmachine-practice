@@ -1,5 +1,6 @@
 package vendingmachine.domain;
 
+import vendingmachine.domain.dto.ChangeAmountDto;
 import vendingmachine.domain.dto.VendingMachineCoinDto;
 
 public class VendingMachine {
@@ -47,5 +48,9 @@ public class VendingMachine {
         return !drinks.isEmptyAll() &&
                 balance >= drinks.getMinPurchaseAmount() &&
                 coins.getTotalCoins() >= balance;
+    }
+
+    public ChangeAmountDto toChangeAmountDto() {
+        return new ChangeAmountDto(coins.getChange(balance));
     }
 }
