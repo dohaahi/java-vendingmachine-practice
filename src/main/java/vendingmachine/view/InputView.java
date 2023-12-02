@@ -1,30 +1,57 @@
 package vendingmachine.view;
 
+import static vendingmachine.util.RetryHandler.retryIfFailure;
 import static vendingmachine.validator.DrinkValidator.validateInputDrink;
 import static vendingmachine.validator.HeldMoneyValidator.validateInputHeldAmount;
+import static vendingmachine.validator.PurchaseDrinkValidator.validateInputPurchaseDrink;
 
 import camp.nextstep.edu.missionutils.Console;
 import java.util.List;
+import vendingmachine.domain.Coins;
 import vendingmachine.domain.Drink;
 import vendingmachine.domain.Drinks;
 import vendingmachine.domain.Money;
+import vendingmachine.domain.PurchaseDrink;
+import vendingmachine.domain.VendingMachine;
 
 public class InputView {
     private static final String HELD_MONEY_AMOUNT_INPUT_MESSAGE = "자판기가 보유하고 있는 금액을 입력해 주세요.";
-    private static final String DRINK_INPUT_MESSAGE = "상품명과 가격, 수량을 입력해 주세요.";
-    private static final String PAYMENT_AMOUNT_INPUT_MESSAGE = "투입 금액을 입력해 주세요.";
+    private static final String DRINK_INPUT_MESSAGE = System.lineSeparator() + "상품명과 가격, 수량을 입력해 주세요.";
+    private static final String PAYMENT_AMOUNT_INPUT_MESSAGE = System.lineSeparator() + "투입 금액을 입력해 주세요.";
+    private static final String PURCHASE_DRINK_INPUT_MESSAGE = System.lineSeparator() +
+            """
+                    투입 금액:%d원
+                    구매할 상품명을 입력해 주세요.
+                    """.stripIndent();
 
-    public static Money readVendingMachineAmount() {
+    public static VendingMachine makeVendingMachine() {
+        Coins coins = retryIfFailure(InputView::readVendingMachineAmount);
+        OutputView.printVendingMachineAmount(coins.toCoinDto());
+        
+        Drinks drinks = retryIfFailure(InputView::readDrinks);
+        Money paymentAmount = retryIfFailure(InputView::readPaymentAmount);
+
+        return VendingMachine.of(coins, drinks, paymentAmount);
+    }
+
+    public static PurchaseDrink readPurchaseDrink(final VendingMachine vendingMachine) {
+        System.out.printf(PURCHASE_DRINK_INPUT_MESSAGE, vendingMachine.getPaymentAmount());
+        String input = readLine();
+        validateInputPurchaseDrink(input);
+
+        return PurchaseDrink.from(vendingMachine, input);
+    }
+
+    private static Coins readVendingMachineAmount() {
         System.out.println(HELD_MONEY_AMOUNT_INPUT_MESSAGE);
         String input = readLine();
         validateInputHeldAmount(input);
 
         int amount = InputConverter.mapToInt(input);
-        return Money.from(amount);
+        return Coins.from(amount);
     }
 
-    public static Drinks readDrinks() {
-        System.out.println();
+    private static Drinks readDrinks() {
         System.out.println(DRINK_INPUT_MESSAGE);
         String input = readLine();
         validateInputDrink(input);
@@ -33,19 +60,13 @@ public class InputView {
         return Drinks.of(drinks);
     }
 
-    public static Money readPaymentAmount() {
-        System.out.println();
+    private static Money readPaymentAmount() {
         System.out.println(PAYMENT_AMOUNT_INPUT_MESSAGE);
         String input = readLine();
         validateInputHeldAmount(input);
 
         int amount = InputConverter.mapToInt(input);
         return Money.from(amount);
-    }
-
-    public static void readPurchaseDrink(final Money paymentAmount) {
-        System.out.println();
-        System.out.println();
     }
 
     private static String readLine() {

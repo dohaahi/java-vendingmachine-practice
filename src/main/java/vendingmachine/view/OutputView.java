@@ -1,6 +1,6 @@
 package vendingmachine.view;
 
-import vendingmachine.domain.dto.CoinDto;
+import vendingmachine.domain.dto.VendingMachineCoinDto;
 
 public class OutputView {
     private static final String HELD_AMOUNT_MESSAGE =
@@ -13,7 +13,7 @@ public class OutputView {
                             10원-%d개
                             """.stripIndent();
 
-    public static void printVendingMachineAmount(final CoinDto coin) {
+    public static void printVendingMachineAmount(final VendingMachineCoinDto coin) {
         System.out.printf(HELD_AMOUNT_MESSAGE, coin.coin500Count(), coin.coin100Count(), coin.coin50Count(),
                 coin.coin10Count());
     }

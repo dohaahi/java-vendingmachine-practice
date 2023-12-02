@@ -2,27 +2,29 @@ package vendingmachine.controller;
 
 import static vendingmachine.util.RetryHandler.retryIfFailure;
 
-import vendingmachine.domain.Coins;
-import vendingmachine.domain.Drinks;
-import vendingmachine.domain.Money;
+import vendingmachine.domain.PurchaseDrink;
+import vendingmachine.domain.VendingMachine;
+import vendingmachine.domain.VendingMachineStatus;
 import vendingmachine.view.InputView;
-import vendingmachine.view.OutputView;
 
 public class VendingMachineController {
+
     public void run() {
-        // 1. 보유 동전 입력
-        Money amount = retryIfFailure(InputView::readVendingMachineAmount);
-        Coins coins = new Coins();
-        coins.makeChangeUntilAmountEmpty(amount);
-        OutputView.printVendingMachineAmount(coins.toCoinDto());
+        // 1. 자판기 생성
+        VendingMachine vendingMachine = InputView.makeVendingMachine();
 
-        Drinks drinks = retryIfFailure(InputView::readDrinks);
-        Money paymentAmount = retryIfFailure(InputView::readPaymentAmount);
-
-        InputView.readPurchaseDrink(paymentAmount);
-
-        // 2. 실행
+        // 2. 상품 구매
+        purchaseDrink(vendingMachine);
 
         // 3. 출력
+    }
+
+    private void purchaseDrink(final VendingMachine vendingMachine) {
+        VendingMachineStatus status = VendingMachineStatus.AVAILABLE_PURCHASE;
+
+        while (status.equals(VendingMachineStatus.AVAILABLE_PURCHASE)) {
+            PurchaseDrink purchaseDrink = retryIfFailure(() -> InputView.readPurchaseDrink(vendingMachine));
+            status = vendingMachine.purchase(purchaseDrink);
+        }
     }
 }

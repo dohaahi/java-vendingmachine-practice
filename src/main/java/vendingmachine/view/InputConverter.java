@@ -24,7 +24,7 @@ public class InputConverter {
         return Arrays.stream(separatedBySemicolon)
                 .map(str -> {
                     String[] values = str.split(",");
-                    return new Drink(
+                    return Drink.of(
                             values[0],
                             Money.from(Integer.parseInt(values[1])),
                             Integer.parseInt(values[2])
